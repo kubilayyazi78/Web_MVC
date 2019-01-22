@@ -21,7 +21,7 @@ namespace Web_Baslangic.Controllers
 
         public ActionResult Detail(int? id)
         {
-            if (id==null) 
+            if (id == null)
             {
                 return RedirectToAction("Index");
 
@@ -33,7 +33,7 @@ namespace Web_Baslangic.Controllers
                 RedirectToAction("Index");
             }
             return View(data);
-            
+
         }
         [HttpPost]
         public ActionResult Add(Category category)
@@ -47,9 +47,9 @@ namespace Web_Baslangic.Controllers
             catch (Exception ex)
             {
 
-              return  RedirectToAction("Index");
+                return RedirectToAction("Index");
             }
-          return RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
         public ActionResult Delete(int? id)
         {
@@ -57,7 +57,7 @@ namespace Web_Baslangic.Controllers
             try
             {
                 var category = db.Categories.Find(id.GetValueOrDefault());
-                if (category==null)
+                if (category == null)
                 {
                     return RedirectToAction("Index");
                 }
@@ -70,6 +70,52 @@ namespace Web_Baslangic.Controllers
                 return RedirectToAction("Index");
             }
             return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public ActionResult Update(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("Index", "Kategori");
+            }
+            try
+            {
+                var data = new NorthwindEntities().Categories.Find(id.Value);
+                if (data == null)
+                {
+                    return RedirectToAction("Index", "Kategori");
+                }
+                return View(data);
+
+            }
+            catch (Exception)
+            {
+
+                return RedirectToAction("Index");
+            }
+        }
+        [HttpPost]
+        public ActionResult Update(Category model)
+        {
+            try
+            {
+                var db = new NorthwindEntities();
+                var data = db.Categories.Find(model.CategoryID);
+
+                if (data == null)
+                    return RedirectToAction("Index");
+
+                data.CategoryName = model.CategoryName;
+                data.Description = model.Description;
+                db.SaveChanges();
+                ViewBag.Message = "<span class='text text-success'>Update Successfully</span>";
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = $"<span class='text text-danger'>Update Error {ex.Message}</span>";
+                return View(model);
+            }
         }
     }
 }
