@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace AjaxIslemleri.Controllers
 {
+
     public class CategoryController : Controller
     {
         // GET: Category
@@ -23,7 +24,7 @@ namespace AjaxIslemleri.Controllers
             {
                 return Json(new ResponseData()
                 {
-                    message = "Aramak için 2 karakterden fazlasını girin",
+                    message = "Aramak icin 2 karakterden fazlasini girin",
                     success = false
                 }, JsonRequestBehavior.AllowGet);
             }
@@ -45,15 +46,17 @@ namespace AjaxIslemleri.Controllers
                 else
                 {
                     data = db.Categories
-                        .Where(x => x.CategoryName.ToLower().Contains(key) || x.Description.Contains(key))
+                        .Where(x =>
+                            x.CategoryName.ToLower().Contains(key)
+                            || x.Description.Contains(key))
                         .Select(x => new CategoryViewModel()
                         {
                             CategoryName = x.CategoryName,
                             Description = x.Description,
                             CategoryID = x.CategoryID,
                             ProductCount = x.Products.Count
-
-                        }).ToList();
+                        })
+                        .ToList();
                 }
                 return Json(new ResponseData()
                 {
@@ -66,12 +69,12 @@ namespace AjaxIslemleri.Controllers
             {
                 return Json(new ResponseData()
                 {
-                    message = $"bir hata oluştu {ex.Message}",
+                    message = $"Bir hata olustu {ex.Message}",
                     success = false
                 }, JsonRequestBehavior.AllowGet);
-
             }
         }
+
         [HttpPost]
         public JsonResult Add(CategoryViewModel model)
         {
@@ -86,20 +89,20 @@ namespace AjaxIslemleri.Controllers
                 db.SaveChanges();
                 return Json(new ResponseData()
                 {
-                    message = $"{model.CategoryName} ismindeki kategori basarıyla eklendi",
+                    message = $"{model.CategoryName} ismindeki kategori basariyla eklendi",
                     success = true
                 }, JsonRequestBehavior.AllowGet);
-
             }
             catch (Exception ex)
             {
                 return Json(new ResponseData()
                 {
-                    message = $"bir hata olustu {ex.Message}",
+                    message = $"Bir hata olustu {ex.Message}",
                     success = false
                 }, JsonRequestBehavior.AllowGet);
             }
         }
+
         [HttpPost]
         public JsonResult Delete(int id)
         {
@@ -111,20 +114,17 @@ namespace AjaxIslemleri.Controllers
                 db.SaveChanges();
                 return Json(new ResponseData()
                 {
-                    message = $"{cat.CategoryName} ismindeki kategori silindi",
+                    message = $"{cat.CategoryName} ismindeki kategori basariyla silindi",
                     success = true
-
                 }, JsonRequestBehavior.AllowGet);
-
             }
             catch (Exception ex)
             {
                 return Json(new ResponseData()
                 {
-                    message=$"kategori silme isleminde hata {ex.Message}",
-                    success=false
+                    message = $"Kategori silme isleiminde hata {ex.Message}",
+                    success = false
                 }, JsonRequestBehavior.AllowGet);
-
             }
         }
     }
