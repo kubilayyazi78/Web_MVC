@@ -187,9 +187,50 @@
                             .append($("<td></td>").text(value.UnitPriceFormatted))
                             .append($("<td></td>").text(value.QuantityPerUnit))
                             .append($("<td></td>").text(value.AddedDateFormatted))
-                            .append($("<td></td>").text("button"))
+                            .append($("<td id=" + key + "></td>"))                              
                             .appendTo($("#resultbody"));
+                        var btnSil = document.createElement("input");
+                        $(btnSil).attr({
+                            "type": "button",
+                            "class": "btn btn-danger",
+                            "value": "Delete",
+                            "name": value.ProductID
+                        }).on("click", function () {
+                            var id = this.name;
+                            $.ajax({
+                                url: "@Url.Action("Delete","Product")",
+                                method: "post",
+                                dataType: "json",
+                                data:{ id: id }
+                            }).done(function (e) {
+                                alert(e.message);
+                                init();
+                            });
+                            });
 
+                        var btnGuncelle = document.createElement("input");
+                        $(btnGuncelle).attr({
+                            "type": "button",
+                            "class": "btn btn-warning",
+                            "value": "Update",
+                            "name": value.ProductID,
+                            "style": "margin-left:5px"
+                        }).on("click", function () {
+                            var id = this.name;
+                            $.ajax({
+                                url: "@Url.Action("Update","Product")",
+                                method: "post",
+                                dataType: "json",
+                                data: { id: id }
+                            }).done(function (e) {
+                                alert(e.message);
+                                init();
+                            });
+                        });
+
+
+                        $(btnSil).appendTo("#"+key);
+                        $(btnGuncelle).appendTo("#"+key);
                     });
             }
 

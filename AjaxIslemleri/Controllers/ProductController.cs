@@ -118,6 +118,33 @@ namespace AjaxIslemleri.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
         }
+        [HttpPost]
+        public JsonResult Delete(int id)
+        {
+            try
+            {
+                var db = new NorthwindEntities();
+                var cat = db.Products.Find(id);
+                db.Products.Remove(cat);
+                db.SaveChanges();
+                return Json(new ResponseData()
+                {
+                    message=$"{cat.ProductName} isminde product silindi",
+                    success=true
+                }, JsonRequestBehavior.AllowGet);
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new ResponseData()
+                {
+                    message=$"ürün silme isleminde hata {ex.Message}",
+                    success=false
+                }, JsonRequestBehavior.AllowGet);
+            
+
+            }
+        }
 
     }
 }
