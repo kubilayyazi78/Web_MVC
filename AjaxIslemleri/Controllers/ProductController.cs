@@ -146,5 +146,44 @@ namespace AjaxIslemleri.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult Update(Product model)
+        {
+            try
+            {
+                var db = new NorthwindEntities();
+                var cat = db.Products.Find(model.ProductID);
+                if (cat==null)
+                {
+                    return Json(new ResponseData()
+                    {
+                        message = $"ürün bulunamadi",
+                        success = false
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                cat.ProductName = model.ProductName;
+                cat.ProductID = model.ProductID;
+                cat.CategoryID = model.CategoryID;
+                cat.UnitPrice = model.UnitPrice;
+                cat.QuantityPerUnit = model.QuantityPerUnit;
+                cat.Discontinued = model.Discontinued;
+                db.SaveChanges();
+                return Json(new ResponseData()
+                {
+                    message = $"{cat.ProductName} ismindeki ürün  basariyla guncellendi",
+                    success = true
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new ResponseData()
+                {
+                    message = $"ürün guncelleme isleminde hata {ex.Message}",
+                    success = false
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
     }
 }

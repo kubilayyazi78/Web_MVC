@@ -11,6 +11,7 @@
     <div class="row">
         <div class="col-md-12">
             <form class="form-horizontal" id="frmAdd">
+
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="txtProductName" class="col-sm-4 control-label">Product Name</label>
@@ -51,19 +52,24 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group">
-                        <div class="col-sm-offset-4 col-sm-6">
+                        <div class="col-sm-4">
+                            <input type="search" id="txtsearch" class="form-control" />
+                        </div>
+                        <div class="col-sm-4">
                             <button type="submit" class="btn btn-info btn-block">Add Product</button>
                         </div>
+
                     </div>
                 </div>
             </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6 col-sm-offset-3 col-xs-12">
-            <input type="search" id="txtsearch" class="form-control" />
+            <form class="form-horizontal" id="frmUpdate">
+                <input type="hidden" id="ProductID" />
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-info btn-block">Update Product</button>
+                </div>
+            </form>
         </div>
     </div>
     <br />
@@ -187,7 +193,7 @@
                             .append($("<td></td>").text(value.UnitPriceFormatted))
                             .append($("<td></td>").text(value.QuantityPerUnit))
                             .append($("<td></td>").text(value.AddedDateFormatted))
-                            .append($("<td id=" + key + "></td>"))                              
+                            .append($("<td id=" + key + "></td>"))
                             .appendTo($("#resultbody"));
                         var btnSil = document.createElement("input");
                         $(btnSil).attr({
@@ -216,16 +222,21 @@
                             "name": value.ProductID,
                             "style": "margin-left:5px"
                         }).on("click", function () {
-                            var id = this.name;
-                            $.ajax({
-                                url: "@Url.Action("Update","Product")",
-                                method: "post",
-                                dataType: "json",
-                                data: { id: id }
-                            }).done(function (e) {
-                                alert(e.message);
-                                init();
-                            });
+                            debugger;
+                            var productId = this.name;
+                            var satir = $(this).parent().parent()[0].childNodes;
+                            var productName = satir[1].innerText;
+                            var categoryName = satir[2].innerText;
+                            var unitPrice = parseFloat(satir[3].innerText);
+                            var quantityPerUnit = satir[4].innerText;
+                            var CategoryID=$("#cmbCategory option:selected").val()
+
+
+                            $("#cmbCategory option:selected").val(CategoryID);
+                            $("#txtProductName").val(productName);
+                            $("#txtQuantityPerUnit").val(quantityPerUnit);
+                            $("#txtUnitPrice").val(unitPrice);
+                            $("#ProductID").val(productId);
                         });
 
 
@@ -263,6 +274,28 @@
                     alert(e.message);
                     if (e.success) {
                         $("#frmAdd")[0].reset();
+                        init();
+                    }
+                });
+            });
+            $("#frmUpdate").submit(function (ev) {
+                ev.preventDefault();
+                var data = {
+                    ProductID: $("#ProductID").val(),
+                    CategoryID: $("#cmbCategory option:selected").val(),
+                    ProductName: $("#txtProductName").val(),
+                    UnitPrice: $("#txtUnitPrice").val().replace(".", ","),
+                    QuantityPerUnit: $("#txtQuantityPerUnit").val(),
+                    Discontinued: $("#cbDiscontinued").is(':checked')
+                };
+                $.ajax({
+                    url: '@Url.Action("Update","Product")',
+                    method: "post",
+                    dataType: "json",
+                    data: data
+                }).done(function (e) {
+                    alert(e.message);
+                    if (e.success) {
                         init();
                     }
                 });
