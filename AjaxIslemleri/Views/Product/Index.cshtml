@@ -94,14 +94,150 @@
 @section scripts
  {
     <style>
-        .loading{
-            z-index:100;
-            position:fixed;
-            top:40%;
-            left:45%;
+        .loading {
+            z-index: 100;
+            position: fixed;
+            top: 40%;
+            left: 45%;
         }
     </style>
     <script>
+        $(function () {
+            $(".loading").hide();
+            $(document).ajaxStart(function (ev) {
+                $(".loading").show();
+                $("#resultdiv").hide();
+            });
+            $(document).ajaxStop(function (ev) {
+                $(".loading").hide();
+                $("#resultdiv").show(100);
+            });
+            $.ajaxQueue = [];
+            var que = ajaxQueue;
+
+            $.ajaxSetup({
+                beforeSend: function () {
+                    if (this.queue) {
+                        que.push(this);
+                    }
+                    else {
+                        return true;
+                    }
+                    if (que.length > 1) {
+                        return false;
+                    }
+                },
+                complete: function (e) {
+                    console.log(e);
+                    if (e.responseJSON.success) {
+                        renderData(e.responseJSON.data);
+                    } else {
+                        alert(e.responseJSON.message);
+                    }
+                    que.shift();
+                    var newReq = que[0];
+                    if (newReq) {
+                        var setup = {
+                            url: newReq.url,
+                            success: newReq.success
+                        };
+                        $.ajax(setup);
+                    }
+                }
+            });
+
+            function init() {
+                $.ajax({
+                    url: "@Url.Action("GetAllCategories","Product")",
+                    method="get",
+                    dataType: "json"
+                }).done(function (e) {
+                    if (e.success) {
+                        $('#cmbCategory').empty();
+                        $('#cmbCategory')
+                            .append($("<option></option>")
+                                .attr("value", o)
+                                .text("Kategorisi yok")
+                            );
+                        $.each(e.data, function (key, value) {
+                            $('#cmbCategory')
+                                .append($("<option></option>")
+                                    .attr("value", value.CategoryID)
+                                    .text(value.CategoryName));
+                        });
+                    }
+                });
+                $.ajax({
+                    url: "@Url.Action("GetAllProducts","Product")",
+                    method: "get",
+                    dataType: "json"
+                }).done(function (e) {
+                    if (e.success) {
+                        renderData(e.data);
+                    }
+                });
+            }
+
+            function renderData(data) {
+                if (data && data.length == 0) {
+                    $("#resultdiv").hide();
+                    return;
+                }
+                $("#resultdiv").show(400);
+                $("#resultbody").empty();
+                $.each(data, function (key, value) {
+                    $("<tr></tr>")
+                        .append($("<th></th>").text(key + 1))
+                        .append($("<td></td>").text(value.ProductName))
+                        .append($("<td></td>").text(value.CategoryName))
+                        .append($("<td></td>").text(value.UnitPriceFormatted))
+                        .append($("<td></td>").text(value.QuantityPerUnit))
+                        .append($("<td></td>").text(value.AddedDateFormatted))
+                        .append($("<td></td>").text("button"))
+                        .appendTo($("#resultbody"));
+                });
+            }
+            $("txtSearch").keyup(function () {
+                $.ajax({
+                    url: "@Url.Action("GetAllProducts","Product")" + "?key=" + $("txtSearch").val(),
+                    method: "get",
+                    dataType: "json",
+                    queue: true
+                });
+
+            });
+            $("#frmAdd").submit(function (ev) {
+                ev.preventDefault();
+                var data = {
+                    CategoryID: $("#cmbCategory option:selected").val(),
+                    ProductName: $("#txtProductName").val(),
+                    UnitPrice: $("#txtUnitPrice").val().replace(".", ","),
+                    QuantityPerUnit: $("#txtQuantityPerUnit").val(),
+                    Discontinued: $("#cbDiscontinued").is(':checked')
+                };
+                console.log(data);
+                $.ajax({
+                    url: "@Url.Action("Add","Product")",
+                    method: "post",
+                    dataType: "json",
+                    data: data
+                }).done(function (e) {
+                    console.log(e);
+                    alert(e.message);
+                    if (success) {
+                        $("#frmAdd")[0].reset();
+                        init();
+
+                    }
+                });
+            });
+            //$("#cmbCategory").change(function () {
+            //    var id = $(this).val();
+
+            //    console.log($("#cmbCategory option:selected").val());
+            //});
+            init();
+        });
 
     </script>
 }
