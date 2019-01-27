@@ -21,10 +21,10 @@
                 <div id="messagediv"></div>
             </form>
             <form class="form-inline" id="frmUpdate" style="display:none">
-                <input type="hidden" id="=CategoryID" />
+                <input type="hidden" id="CategoryID" />
                 <div class="form-group">
                     <label for="txtCategoryName2">Category Name</label>
-                    <input type="text" class="form-control"id="categoryName2" placeholder="Category Name" />
+                    <input type="text" class="form-control"id="txtCategoryName2" placeholder="Category Name" />
                 </div>
                 <div class="form-group">
                     <label for="txtDescription2">Description</label>
@@ -64,6 +64,8 @@
                 </thead>
                 <tbody id="resultbody"></tbody>
             </table>
+
+
         </div>
     </div>
 </div>
@@ -103,13 +105,14 @@
                 });
             });
             $("#frmUpdate").submit(function (ev) {
+                debugger;
                 ev.preventDefault();
                 var data = {
                     CategoryName: $("#txtCategoryName2").val(),
-                    Description: $("txtDescription2").val,
-                    CategoryID: $("#CategoryID").val
+                    Description: $("#txtDescription2").val(),
+                    CategoryID: $("#CategoryID").val()
                 };
-                ajax({
+                $.ajax({
                     url: '@Url.Action("Update","Category")',
                     method: "post",
                     dataType: "json",
@@ -197,19 +200,20 @@
                             "name": value.CategoryID
                         }).on("click",
                             function () {
+                                
                                 var categoryId = this.name;
-                                var satir = $(this).parent()[0].childNodes;
+                                var satir = $(this).parent().parent()[0].childNodes;
                                 var categoryName = satir[1].innerText;
                                 var description = satir[2].innerText;
                                 $("#CategoryID").val(categoryId);
-                                $("#txtDescription").val(description);
-                                $("#txtCategoryName2").val(description);
+                                $("#txtDescription2").val(description);
+                                $("#txtCategoryName2").val(categoryName);
                                 $("#frmAdd").hide();
                                 $("#frmUpdate").show(400);
 
 
                             }
-                        )
+                        );
 
                         $(a).appendTo(td4);
                         $(btnSil).appendTo(td4);

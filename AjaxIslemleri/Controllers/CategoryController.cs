@@ -127,5 +127,41 @@ namespace AjaxIslemleri.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        [HttpPost]
+        public JsonResult Update(Category model)
+        {
+            try
+            {
+                var db = new NorthwindEntities();
+                var cat = db.Categories.Find(model.CategoryID);
+                if (cat==null)
+                {
+                    return Json(new ResponseData()
+                    {
+                        message = $"Kategori bulunamadı",
+                        success = false
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                cat.Description = model.Description;
+                cat.CategoryName = model.CategoryName;
+                db.SaveChanges();
+
+                return Json(new ResponseData()
+                {
+                    message = $"{cat.CategoryName}ismindeki kategori yüklendi",
+                    success = true
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new ResponseData()
+                {
+                    message = $"Kategori guncelleme isleminde hata {ex.Message}",
+                    success = false
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }
