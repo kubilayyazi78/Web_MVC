@@ -18,7 +18,7 @@ namespace AjaxIslemleri.Models.ViewModels
         public short? UnitsOnOrder { get; set; }
         public short? ReorderLevel { get; set; }
         public bool Discontinued { get; set; }
-        public DateTime AddedDate { get; set; }
+        public DateTime AddedDate { get; set; } 
         public string AddedDateFormatted { get; set; }
         public string CategoryName { get; set; }
         public string SupplierName { get; set; }
